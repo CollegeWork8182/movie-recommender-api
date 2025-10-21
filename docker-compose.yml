@@ -1,0 +1,6 @@
+﻿services:
+  movierecommenderapi:
+    image: movierecommenderapi
+    build:
+      context: .
+      dockerfile: Dockerfile
