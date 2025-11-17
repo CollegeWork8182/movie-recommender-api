@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using movieRecommenderApi.Dtos;
 using movieRecommenderApi.Infra;
+using movieRecommenderApi.Interfaces;
 using movieRecommenderApi.Services;
 
 namespace movieRecommenderApi.Controllers;
@@ -9,19 +10,17 @@ namespace movieRecommenderApi.Controllers;
 [Route("api/[controller]")]
 public class MovieController : ControllerBase
 {
-    private readonly MovieService _movieService;
-    private readonly MockMovies _mockMovies;
+    private readonly IMovieService _movieService;
 
-    public MovieController()
+    public MovieController(IMovieService movieService)
     {
-        _mockMovies = new MockMovies();
-        _movieService = new MovieService(_mockMovies);
+        _movieService = movieService;
     }
 
     [HttpPost("recommender")]
-    public IActionResult GetRecommendations([FromBody] MovieRequestDTO data)
+    public async Task<IActionResult> GetRecommendations([FromBody] MovieRequestDTO data)
     {
-        var recommendations = _movieService.Recommend(data.Title, data.Genres);
+        var recommendations = await _movieService.RecommendAsync(data.Title, data.Genres);
 
         if (!recommendations.Any())
             return NotFound(new { message = "Filme não encontrado" });
@@ -30,9 +29,9 @@ public class MovieController : ControllerBase
     }
 
     [HttpGet("all")]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(_movieService.FindAll());
+        return Ok(await _movieService.FindAllAsync());
     }
     
 }

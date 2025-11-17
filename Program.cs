@@ -1,4 +1,7 @@
 using movieRecommenderApi.Config;
+using movieRecommenderApi.Infra;
+using movieRecommenderApi.Interfaces;
+using movieRecommenderApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCorsExtension();
+
+builder.Services.AddSingleton<IMovieRepository, MockMovies>();
+builder.Services.AddScoped<IMovieService, MovieService>();
 
 var app = builder.Build();
 

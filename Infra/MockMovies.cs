@@ -1,8 +1,9 @@
 using movieRecommenderApi.Entities;
+using movieRecommenderApi.Interfaces;
 
 namespace movieRecommenderApi.Infra;
 
-public class MockMovies
+public class MockMovies : IMovieRepository
 {
     public ICollection<MovieEntity> Movies { get; set; }
 
@@ -18,5 +19,10 @@ public class MockMovies
             new MovieEntity { Id = 6, Title = "Avengers", Genres = new() { "Action", "Adventure", "Sci-Fi" } },
             new MovieEntity { Id = 7, Title = "Joker", Genres = new() { "Crime", "Drama", "Thriller" } }
         };
+    }
+
+    public Task<ICollection<MovieEntity>> GetAllAsync()
+    {
+        return Task.FromResult(Movies);
     }
 }

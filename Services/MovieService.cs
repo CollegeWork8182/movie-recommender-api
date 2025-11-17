@@ -1,19 +1,20 @@
 using movieRecommenderApi.Dtos;
 using movieRecommenderApi.Entities;
 using movieRecommenderApi.Infra;
+using movieRecommenderApi.Interfaces;
 
 namespace movieRecommenderApi.Services;
 
-public class MovieService
+public class MovieService : IMovieService
 {
-    private MockMovies _mockMovies;
+    private readonly IMovieRepository _movieRepository;
 
-    public MovieService(MockMovies mockMovies)
+    public MovieService(IMovieRepository movieRepository)
     {
-        _mockMovies = mockMovies;
+        _movieRepository = movieRepository;
     }
 
-    public IEnumerable<MovieEntity> Recommend(string movieTitle, List<string> movieGenre, int k = 3)
+    public async Task<IEnumerable<MovieEntity>> RecommendAsync(string movieTitle, List<string> movieGenre, int k = 3)
     {
         // Cria um filme "virtual" com base na entrada
         var target = new MovieEntity()
@@ -22,8 +23,10 @@ public class MovieService
             Genres = movieGenre
         };
 
+        var movies = await _movieRepository.GetAllAsync();
+
         // Calcula a similaridade combinada (por gênero + nome)
-        var similarities = _mockMovies.Movies
+        var similarities = movies
             .Where(m => !m.Title.Equals(target.Title, StringComparison.OrdinalIgnoreCase))
             .Select(m => new
             {
@@ -37,13 +40,13 @@ public class MovieService
         return similarities;
     }
 
-    public List<FindAllMoviesDTO> FindAll()
+    public async Task<List<FindAllMoviesDTO>> FindAllAsync()
     {
-        var movies = _mockMovies.Movies
+        var movies = await _movieRepository.GetAllAsync();
+
+        return movies
             .Select(m => new FindAllMoviesDTO(m.Id, m.Title, m.Genres))
             .ToList();
-
-        return movies;
     }
 
     private double CalculateSimilarity(MovieEntity a, MovieEntity b)
