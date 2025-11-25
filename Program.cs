@@ -13,7 +13,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCorsExtension();
 
-builder.Services.AddSingleton<IMovieRepository, MockMovies>();
+builder.Services.AddHttpClient();
+
+// builder.Services.AddSingleton<IMovieRepository, MockMovies>();
+builder.Services.AddScoped<IMovieRepository, TmdbRepository>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 
 var app = builder.Build();
